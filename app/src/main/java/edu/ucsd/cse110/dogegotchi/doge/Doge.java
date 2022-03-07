@@ -6,7 +6,11 @@ import com.google.common.base.Preconditions;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
+import edu.ucsd.cse110.dogegotchi.FoodMenu.IMenuObserver;
+import edu.ucsd.cse110.dogegotchi.daynightcycle.DayNightCycleMediator;
+import edu.ucsd.cse110.dogegotchi.daynightcycle.IDayNightCycleObserver;
 import edu.ucsd.cse110.dogegotchi.observer.ISubject;
 import edu.ucsd.cse110.dogegotchi.ticker.ITickerObserver;
 
@@ -17,7 +21,7 @@ import edu.ucsd.cse110.dogegotchi.ticker.ITickerObserver;
  *
  * TODO: Exercise 2 -- enable {@link State#SAD} mood, and add support for {@link State#EATING} behavior.
  */
-public class Doge implements ISubject<IDogeObserver>, ITickerObserver {
+public class Doge implements ISubject<IDogeObserver>, ITickerObserver, IDayNightCycleObserver, IMenuObserver {
     /**
      * Current number of ticks. Reset after every potential mood swing.
      */
@@ -37,6 +41,11 @@ public class Doge implements ISubject<IDogeObserver>, ITickerObserver {
      * State of doge.
      */
     State state;
+
+    /**
+     * Period of dogewrld.
+     */
+    Period period;
 
     private Collection<IDogeObserver> observers;
 
@@ -71,6 +80,7 @@ public class Doge implements ISubject<IDogeObserver>, ITickerObserver {
             tryRandomMoodSwing();
             this.numTicks = 0;
         }
+        if (state.equals(State.HAPPY) && period.equals(Period.NIGHT)) setState(State.SLEEPING);
     }
 
     /**
@@ -80,6 +90,9 @@ public class Doge implements ISubject<IDogeObserver>, ITickerObserver {
      */
     private void tryRandomMoodSwing() {
         // TODO: Exercise 1 -- Implement this method...
+        Random random = new Random();
+        int prob = random.nextInt(100);
+        if (state.equals(State.HAPPY) && prob > moodSwingProbability*100) setState(State.SAD);
     }
 
     @Override
@@ -107,13 +120,29 @@ public class Doge implements ISubject<IDogeObserver>, ITickerObserver {
         }
     }
 
+    @Override
+    public void onPeriodChange(Period newPeriod) {
+        this.period = newPeriod;
+        if (newPeriod.equals(Period.NIGHT) && state.equals(State.HAPPY)) setState(State.SLEEPING);
+        else if (newPeriod.equals(Period.DAY) && state.equals(State.SLEEPING)) setState(State.HAPPY);
+    }
+
+    @Override
+    public void dogeFed() {
+        setState(State.HAPPY);
+    }
+
+    @Override
+    public void feedDoge() {
+        setState(State.EATING);
+    }
+
     /**
      * Moods and actions for our doge.
      */
     public enum State {
         HAPPY,
         SAD,
-        // TODO: Implement asleep and eating states, and transitions between all states.
         SLEEPING,
         EATING;
     }

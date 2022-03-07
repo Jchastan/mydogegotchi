@@ -9,8 +9,14 @@
     <integer name="sleeping_y">240</integer>
 
     <!-- TODO: Exercise 1 - Setup SAD coordinates (also set up sprite in MainActivity.java) -->
+    <!-- Sad -->
+    <integer name="sad_x">600</integer>
+    <integer name="sad_y">300</integer>
 
     <!-- TODO: Exercise 2 - Setup EATING coordinates (also set up sprite in MainActivity.java) -->
+    <!-- Eating -->
+    <integer name="eating_x">600</integer>
+    <integer name="eating_y">300</integer>
 
 
     <!-- Number of times a mood swing may happen during the day. -->
